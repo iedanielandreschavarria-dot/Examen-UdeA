@@ -57,6 +57,7 @@ export interface StudySession {
   completedAt?: string;
   score: number | null; // 0 to 100 percentage in session
   notes: string;
+  minutesPracticed?: number; // Minutos reales practicados ese día
 }
 
 export interface PhaseInfo {

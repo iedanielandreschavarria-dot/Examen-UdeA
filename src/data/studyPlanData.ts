@@ -6,8 +6,8 @@ export const PHASES_INFO: PhaseInfo[] = [
     name: 'Fase 1: Base y Diagnóstico',
     subtitle: 'Fundamentación cuantitativa y arquitectura textual',
     weeksRange: [1, 8],
-    defaultStartDate: '2026-11-15',
-    defaultEndDate: '2027-01-09',
+    defaultStartDate: '2026-11-16',
+    defaultEndDate: '2027-01-10',
     description:
       'Construcción de cimientos sólidos en aritmética sin calculadora, razones, proporciones, porcentajes, planteamiento de ecuaciones lineales, junto con estrategias de lectura activa, tipología textual y precisión semántica.',
     focusTopics: [
@@ -1179,6 +1179,22 @@ function addDaysToIso(baseIso: string, daysToAdd: number): string {
   return dt.toISOString().slice(0, 10);
 }
 
+const UTC_DAY_TO_SPANISH: Array<StudySession['dayName']> = [
+  'Domingo',
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado',
+];
+
+export function getRealDayNameFromIso(isoDate: string): StudySession['dayName'] {
+  const [y, m, d] = isoDate.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return UTC_DAY_TO_SPANISH[dt.getUTCDay()] || 'Lunes';
+}
+
 export function buildBreakdownForComponent(
   component: SessionComponent,
   dailyHours: number = 1
@@ -1218,7 +1234,7 @@ export function buildBreakdownForComponent(
 }
 
 export function generateInitialSessions(
-  startDate: string = '2026-11-15',
+  startDate: string = '2026-11-16',
   dailyHours: number = 1
 ): StudySession[] {
   const sessions: StudySession[] = [];
@@ -1282,7 +1298,7 @@ export function generateInitialSessions(
         weekNumber: weekItem.week,
         phaseId: weekItem.phase,
         dayIndex: dCfg.dayIndex,
-        dayName: DAY_NAMES[dCfg.dayIndex],
+        dayName: getRealDayNameFromIso(dateStr),
         date: dateStr,
         component: dCfg.component,
         topic: dCfg.topic,

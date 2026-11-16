@@ -27,6 +27,7 @@ import {
 import {
   generateInitialSessions,
   buildBreakdownForComponent,
+  getRealDayNameFromIso,
 } from './data/studyPlanData';
 import { INITIAL_QUESTIONS_BANK } from './data/questionsData';
 import {
@@ -48,7 +49,7 @@ const STORAGE_KEY = 'udea_prep_state_v1';
 function createDefaultState(): AppState {
   const defaultConfig: StudyConfig = {
     targetDate: '2027-06-30',
-    startDate: '2026-11-15',
+    startDate: '2026-11-16',
     dailyHours: 1,
     daysPerWeek: 7,
     targetProgram: 'Medicina (Medellín)',
@@ -57,7 +58,7 @@ function createDefaultState(): AppState {
   };
 
   return {
-    version: 1,
+    version: 2,
     darkMode: false,
     config: defaultConfig,
     sessions: generateInitialSessions(defaultConfig.startDate, defaultConfig.dailyHours),
@@ -74,7 +75,30 @@ export function App() {
       if (saved) {
         const parsed = JSON.parse(saved) as AppState;
         if (parsed && Array.isArray(parsed.sessions) && parsed.sessions.length > 0) {
-          return parsed;
+          // Migrate old 2026-11-15 (Sunday) start date to 2026-11-16 (Monday) & sync real weekday names
+          const effectiveStartDate =
+            parsed.config?.startDate === '2026-11-15'
+              ? '2026-11-16'
+              : parsed.config?.startDate || '2026-11-16';
+
+          const migratedSessions = parsed.sessions.map((s, idx) => {
+            const correctedDate = addDays(effectiveStartDate, idx);
+            return {
+              ...s,
+              date: correctedDate,
+              dayName: getRealDayNameFromIso(correctedDate),
+            };
+          });
+
+          return {
+            ...parsed,
+            version: 2,
+            config: {
+              ...parsed.config,
+              startDate: effectiveStartDate,
+            },
+            sessions: migratedSessions,
+          };
         }
       }
     } catch (err) {
@@ -125,6 +149,7 @@ export function App() {
         return {
           ...s,
           date: newDate,
+          dayName: getRealDayNameFromIso(newDate),
           breakdown: newBreakdown,
         };
       });
@@ -155,15 +180,51 @@ export function App() {
       sessions: prev.sessions.map((s) => {
         if (s.id !== sessionId) return s;
         const nextCompleted = !s.completed;
+        const defaultSessionMin =
+          s.breakdown.theoryMin + s.breakdown.practiceMin + s.breakdown.logMin;
         return {
           ...s,
           completed: nextCompleted,
           completedAt: nextCompleted ? new Date().toISOString() : undefined,
           score: score !== undefined ? score : s.score,
           notes: notes !== undefined ? notes : s.notes,
+          minutesPracticed: nextCompleted
+            ? s.minutesPracticed && s.minutesPracticed > 0
+              ? s.minutesPracticed
+              : defaultSessionMin
+            : 0,
         };
       }),
     }));
+  };
+
+  const handleUpdateSessionPracticeMinutes = (
+    sessionId: string,
+    minutes: number,
+    markCompleted: boolean
+  ) => {
+    setState((prev) => ({
+      ...prev,
+      sessions: prev.sessions.map((s) =>
+        s.id === sessionId
+          ? {
+              ...s,
+              minutesPracticed: minutes,
+              completed: markCompleted,
+              completedAt: markCompleted
+                ? s.completedAt || new Date().toISOString()
+                : undefined,
+              score: markCompleted ? s.score : null,
+              notes: markCompleted ? s.notes : '',
+            }
+          : s
+      ),
+    }));
+    showToast(
+      minutes > 0
+        ? `Registrados ${minutes} minutos de práctica en el calendario.`
+        : 'Registro del día eliminado (0 min).'
+    );
   };
 
   const handleUpdateSessionDetails = (
@@ -661,6 +722,7 @@ export function App() {
               onUpdateTargetDate={handleUpdateTargetDate}
               onNavigate={setActiveModule}
               onOpenLessonModal={(sessionId) => setLessonModalSessionId(sessionId)}
+              onUpdateSessionPracticeMinutes={handleUpdateSessionPracticeMinutes}
             />
           )}
 

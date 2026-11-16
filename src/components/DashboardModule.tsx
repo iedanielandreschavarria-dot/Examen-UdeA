@@ -35,6 +35,7 @@ import {
   formatSpanishDate,
   getTodayIso,
 } from '../utils/dateAndStats';
+import { StudyActivityHeatmap } from './StudyActivityHeatmap';
 
 interface DashboardModuleProps {
   state: AppState;
@@ -42,6 +43,11 @@ interface DashboardModuleProps {
   onUpdateTargetDate: (newDate: string) => void;
   onNavigate: (module: ModuleId) => void;
   onOpenLessonModal: (sessionId: string) => void;
+  onUpdateSessionPracticeMinutes: (
+    sessionId: string,
+    minutes: number,
+    markCompleted: boolean
+  ) => void;
 }
 
 export const DashboardModule: React.FC<DashboardModuleProps> = ({
@@ -50,6 +56,7 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
   onUpdateTargetDate,
   onNavigate,
   onOpenLessonModal,
+  onUpdateSessionPracticeMinutes,
 }) => {
   const { config, sessions, simulacros, errorNotebook } = state;
   const [editingDate, setEditingDate] = useState(false);
@@ -549,6 +556,15 @@ export const DashboardModule: React.FC<DashboardModuleProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Gráfico Calendario de Constancia estilo GitHub Contributions */}
+      <StudyActivityHeatmap
+        sessions={sessions}
+        simulacros={simulacros}
+        dailyHours={config.dailyHours}
+        onOpenLessonModal={onOpenLessonModal}
+        onUpdateSessionPracticeMinutes={onUpdateSessionPracticeMinutes}
+      />
     </div>
   );
 };
