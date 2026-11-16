@@ -29,42 +29,52 @@ export function getLessonGuideForSession(
       : true
   );
 
-  // Match by topic keywords first
+  // Match by topic keywords across the 80-question bank
   const keywordMatches = compQuestions.filter((q) => {
     const qText = `${q.topic} ${q.statement}`.toLowerCase();
-    if (textKey.includes('porcentaje') || textKey.includes('fracci')) {
-      return qText.includes('porcentaje') || qText.includes('fracci') || q.id === 'rl-01';
+    if (textKey.includes('porcentaje') || textKey.includes('fracci') || textKey.includes('mezcla')) {
+      return qText.includes('porcentaje') || qText.includes('fracci') || qText.includes('mezcla');
     }
-    if (textKey.includes('conjunto') || textKey.includes('venn') || textKey.includes('tabla')) {
-      return qText.includes('conjunto') || qText.includes('encuesta') || q.id === 'rl-02';
+    if (textKey.includes('conjunto') || textKey.includes('venn') || textKey.includes('tabla') || textKey.includes('gráfica') || textKey.includes('sector')) {
+      return qText.includes('conjunto') || qText.includes('tabla') || qText.includes('gráfica') || qText.includes('circular') || qText.includes('frecuencia');
     }
-    if (textKey.includes('operador') || textKey.includes('no convencional') || textKey.includes('secuencia')) {
-      return qText.includes('operador') || q.id === 'rl-03';
+    if (textKey.includes('operador') || textKey.includes('no convencional') || textKey.includes('secuencia') || textKey.includes('sucesi') || textKey.includes('ciclicidad')) {
+      return qText.includes('operador') || qText.includes('secuencia') || qText.includes('ciclicidad') || qText.includes('residuo');
     }
-    if (textKey.includes('geometr') || textKey.includes('área') || textKey.includes('perímetro') || textKey.includes('espacial')) {
-      return qText.includes('geometr') || qText.includes('área') || q.id === 'rl-04';
+    if (textKey.includes('geometr') || textKey.includes('área') || textKey.includes('perímetro') || textKey.includes('espacial') || textKey.includes('cubo') || textKey.includes('volumen')) {
+      return qText.includes('geometr') || qText.includes('área') || qText.includes('perímetro') || qText.includes('espacial') || qText.includes('cubo');
     }
-    if (textKey.includes('proposicional') || textKey.includes('cuantificador') || textKey.includes('verdad')) {
-      return qText.includes('proposicional') || qText.includes('premisa') || q.id === 'rl-05';
+    if (textKey.includes('proposicional') || textKey.includes('cuantificador') || textKey.includes('verdad') || textKey.includes('ordenamiento')) {
+      return qText.includes('proposicional') || qText.includes('cuantificador') || qText.includes('verdad') || qText.includes('ordenamiento') || qText.includes('condicional');
     }
-    if (textKey.includes('conteo') || textKey.includes('permuta') || textKey.includes('combin') || textKey.includes('probabilidad')) {
-      return qText.includes('conteo') || qText.includes('maneras') || q.id === 'rl-06';
+    if (textKey.includes('conteo') || textKey.includes('permuta') || textKey.includes('combin') || textKey.includes('probabilidad') || textKey.includes('certeza') || textKey.includes('palomar')) {
+      return qText.includes('conteo') || qText.includes('permuta') || qText.includes('probabilidad') || qText.includes('palomar') || qText.includes('certeza');
     }
-    if (textKey.includes('semántica') || textKey.includes('cohesión') || textKey.includes('anáfora') || textKey.includes('conector')) {
-      return q.id === 'cl-01' || q.id === 'cl-04';
+    if (textKey.includes('ecuacion') || textKey.includes('edad') || textKey.includes('grifo') || textKey.includes('proporcion') || textKey.includes('promedio') || textKey.includes('mcm') || textKey.includes('mcd')) {
+      return qText.includes('ecuacion') || qText.includes('edad') || qText.includes('grifo') || qText.includes('proporcion') || qText.includes('promedio') || qText.includes('mcm') || qText.includes('mcd');
+    }
+    if (textKey.includes('semántica') || textKey.includes('cohesión') || textKey.includes('anáfora') || textKey.includes('conector') || textKey.includes('puntuación') || textKey.includes('sinonimia') || textKey.includes('hiperonim')) {
+      return qText.includes('semántica') || qText.includes('cohesión') || qText.includes('anáfora') || qText.includes('conector') || qText.includes('puntuación') || qText.includes('sinonimia') || qText.includes('hiperonim');
     }
     if (textKey.includes('analogía') || textKey.includes('analógica')) {
-      return q.id === 'cl-03' || q.id === 'cl-01';
+      return qText.includes('analogía') || qText.includes('analógica');
     }
-    if (textKey.includes('crítica') || textKey.includes('inferencia') || textKey.includes('comparad') || textKey.includes('etimolog')) {
-      return q.id === 'cl-05' || q.id === 'cl-06';
+    if (textKey.includes('crítica') || textKey.includes('inferencia') || textKey.includes('comparad') || textKey.includes('etimolog') || textKey.includes('polifonía') || textKey.includes('concesión') || textKey.includes('literari') || textKey.includes('tipología')) {
+      return qText.includes('crítica') || qText.includes('inferencia') || qText.includes('intertextual') || qText.includes('etimolog') || qText.includes('polifonía') || qText.includes('concesion') || qText.includes('literari') || qText.includes('tipología');
     }
     return false;
   });
 
+  // Rotate starting offset by week and day so each session shows fresh questions from the 80-question bank
+  const offset = ((session.weekNumber - 1) * 3 + session.dayIndex) % Math.max(1, compQuestions.length);
+  const rotatedCompQuestions = [
+    ...compQuestions.slice(offset),
+    ...compQuestions.slice(0, offset),
+  ];
+
   // Dedicated high-yield extra questions per theme so the student always has tailored exercises
   const extraQuestions: Question[] = buildTopicSpecificQuestions(session);
-  const combined = [...extraQuestions, ...keywordMatches, ...compQuestions];
+  const combined = [...extraQuestions, ...keywordMatches, ...rotatedCompQuestions];
   const uniqueQuestions: Question[] = [];
   const seenIds = new Set<string>();
   for (const item of combined) {
@@ -72,7 +82,7 @@ export function getLessonGuideForSession(
       seenIds.add(item.id);
       uniqueQuestions.push(item);
     }
-    if (uniqueQuestions.length >= 3) break;
+    if (uniqueQuestions.length >= 4) break;
   }
 
   // Build tailored theoretical synthesis based on session topic

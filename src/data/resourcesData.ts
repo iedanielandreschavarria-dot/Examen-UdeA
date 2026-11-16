@@ -78,17 +78,66 @@ export const VERIFIED_RESOURCES: VerifiedResource[] = [
   {
     id: 'res-escolaria-talleres',
     category: 'Bancos de Guías y Talleres',
-    title: 'Materiales de Práctica y Blog Académico — Escolaria',
+    title: 'Guías UdeA No. 01 a No. 04 y Simulacros — Escolaria',
     institution: 'Referencia Externa Especializada en UdeA',
-    url: 'https://escolaria.co/',
-    badge: 'Mapeo de Subtemas',
+    url: 'https://escolaria.co/simulacros-examen-de-admision-udea-universidad-de-antioquia/',
+    badge: 'Guías 02 y 04 con Solución Paso a Paso',
     purpose:
-      'Fuente complementaria de talleres prácticos, explicaciones de problemas clásicos de geometría sombreada, operadores arbitrarios, conteo y simulacros diagnósticos enfocados en la UdeA.',
+      'Fuente complementaria de talleres prácticos en PDF desde nivel básico hasta avanzado. La Guía No. 02 incluye soluciones explicadas paso a paso y la Guía No. 04 incluye respuestas explicadas con análisis de cada pregunta.',
     dailyIntegration:
-      'Selecciona 10 preguntas del subtema del día para resolver en 22,5 minutos exactos con el cronómetro del Módulo 4 y registra cualquier fallo en el Cuaderno de Errores (Módulo 5).',
+      'Selecciona 10 preguntas del subtema del día para resolver en 22,5 minutos exactos con el Reloj de Estudio lateral y registra cualquier fallo en el Cuaderno de Errores (Módulo 5).',
     highlights: [
+      'Guías 01 a 04 descargables gratuitamente (Guías 02 y 04 con desarrollo explicado)',
       'Enfoque específico en problemas tipo UdeA sin calculadora',
       'Útil para reforzar Fase 2 (Conteo/Probabilidad) y Fase 3 (Geometría/Gráficas)',
+    ],
+  },
+  {
+    id: 'res-examenes-lat',
+    category: 'Estrategia y Simulacros',
+    title: 'Simulador Web UdeA 80 Preguntas — Exámenes.lat',
+    institution: 'Simulador Interactivo Externo Verificado',
+    url: 'https://examenes.lat/co/universidades/udea/',
+    badge: '80 Ítems + Pistas y Explicación',
+    purpose:
+      'Cuestionario interactivo gratuito de 80 preguntas originales (40 Competencia Lectora y 40 Razonamiento Lógico, o modalidad solo Razonamiento Lógico) que entrega pista por pregunta, respuesta correcta y explicación del tema evaluado.',
+    dailyIntegration:
+      'Como este portal no incluye cronómetro límite automático para las 3 horas, actívalo junto con el Reloj de Estudio Flotante de UdeA Prep (fijado en 60m o 180m) los domingos de simulacro.',
+    highlights: [
+      'Gratuito y con explicación escrita que identifica el tema evaluado en cada ítem',
+      'Registra tu puntaje final (/40 Lectura y /40 Lógica) en la pestaña "Simulacro Externo" del Módulo 4',
+    ],
+  },
+  {
+    id: 'res-iasimulacros',
+    category: 'Estrategia y Simulacros',
+    title: 'Simulacro Formato Real UdeA (79 ítems) — IAsimulacros',
+    institution: 'Plataforma Externa con Modo Cronometrado',
+    url: 'https://www.iasimulacros.com/simulacros/udea',
+    badge: 'Modo Práctica / Modo Serio con Reloj',
+    purpose:
+      'Simulacro transversal de 79 preguntas (39 de Competencia Lectora y 40 de Razonamiento Lógico sin fórmulas memorísticas), con explicación escrita por pregunta y apoyo socrático.',
+    dailyIntegration:
+      'En cuenta gratuita permite 1 prueba diaria de práctica; evita el cuestionario secundario de 200 preguntas (que evalúa áreas ICFES Saber 11) y concéntrate exclusivamente en el simulacro de formato transversal UdeA.',
+    highlights: [
+      'Cuenta con Modo Serio (reloj activo sin ayudas) y Modo Práctica (retroalimentación inmediata)',
+      'Alineado con el estándar sin calculadora ni asignaturas memorísticas',
+    ],
+  },
+  {
+    id: 'res-youtube-solucionarios',
+    category: 'Bancos de Guías y Talleres',
+    title: 'Solucionarios en Video Paso a Paso (Preu Conocerte / Clases con Juan)',
+    institution: 'Canales Educativos en YouTube Verificados',
+    url: 'https://www.youtube.com/watch?v=Xul68oDDM8Q',
+    badge: 'Resolución Comentada en Video',
+    purpose:
+      'Sesiones grabadas de ~2 horas donde docentes desarrollan paso a paso exámenes de admisión y simulacros UdeA, permitiendo observar los atajos geométricos y el descarte de distractores en tiempo real.',
+    dailyIntegration:
+      'Pausa el video apenas aparezca el enunciado en pantalla, resuélvelo en máximo 2 minutos y 15 segundos con el temporizador lateral, y luego reproduce la explicación docente para comparar tu método.',
+    highlights: [
+      'Solución Examen UdeA (Preu Conocerte) y sesiones en vivo de Escolaria / Clases con Juan',
+      'Ideal para aprender trucos visuales en áreas sombreadas, conteo y lectura crítica',
     ],
   },
   {

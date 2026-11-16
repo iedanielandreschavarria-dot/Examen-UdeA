@@ -1,4 +1,6 @@
 import { Question } from '../types';
+import { EXTRA_LECTURA_QUESTIONS } from './questionsLecturaExtra';
+import { EXTRA_LOGICA_QUESTIONS } from './questionsLogicaExtra';
 
 export const INITIAL_QUESTIONS_BANK: Question[] = [
   // =========================================================================
@@ -392,5 +394,7 @@ export const INITIAL_QUESTIONS_BANK: Question[] = [
       D: 'INCORRECTA (Error aritmético en C(5,2)). Calcula C(5,2) como 8 en lugar de 10.',
     },
   },
+  ...EXTRA_LECTURA_QUESTIONS,
+  ...EXTRA_LOGICA_QUESTIONS,
 ];
 
