@@ -4,6 +4,7 @@ export type ModuleId =
   | 'plan'
   | 'entrenador'
   | 'errores'
+  | 'vocabulario'
   | 'recursos';
 
 export type SessionComponent =
@@ -133,6 +134,24 @@ export interface ExamGuideTopic {
   estimatedWeight: string;
 }
 
+export type VocabularyCategory =
+  | 'Léxico Académico'
+  | 'Raíz / Etimología'
+  | 'Locución Latina'
+  | 'Conector / Discurso'
+  | 'Científico / Médico';
+
+export interface VocabularyEntry {
+  id: string;
+  word: string;
+  meaning: string;
+  category: VocabularyCategory;
+  synonyms?: string;
+  example?: string;
+  mastered: boolean;
+  createdAt: string; // YYYY-MM-DD
+}
+
 export interface AppState {
   version: number;
   darkMode: boolean;
@@ -141,5 +160,6 @@ export interface AppState {
   customQuestions: Question[];
   errorNotebook: ErrorNotebookEntry[];
   simulacros: SimulacroRecord[];
+  vocabulary?: VocabularyEntry[];
 }
 

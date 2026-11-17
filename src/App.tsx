@@ -14,6 +14,7 @@ import {
   GraduationCap,
   Menu,
   X,
+  BookA,
 } from 'lucide-react';
 import {
   AppState,
@@ -23,6 +24,7 @@ import {
   ErrorCode,
   SimulacroRecord,
   ErrorNotebookEntry,
+  VocabularyEntry,
 } from './types';
 import {
   generateInitialSessions,
@@ -34,12 +36,14 @@ import {
   INITIAL_SIMULACROS,
   INITIAL_ERROR_NOTEBOOK,
 } from './data/resourcesData';
+import { INITIAL_VOCABULARY } from './data/vocabularyData';
 import { addDays, getTodayIso } from './utils/dateAndStats';
 import { DashboardModule } from './components/DashboardModule';
 import { ExamGuideModule } from './components/ExamGuideModule';
 import { StudyPlanModule } from './components/StudyPlanModule';
 import { TrainerModule } from './components/TrainerModule';
 import { ErrorNotebookModule } from './components/ErrorNotebookModule';
+import { VocabularyModule } from './components/VocabularyModule';
 import { ResourcesModule } from './components/ResourcesModule';
 import { FloatingStudyTimer } from './components/FloatingStudyTimer';
 import { DailyLessonModal } from './components/DailyLessonModal';
@@ -65,6 +69,7 @@ function createDefaultState(): AppState {
     customQuestions: [],
     errorNotebook: INITIAL_ERROR_NOTEBOOK,
     simulacros: INITIAL_SIMULACROS,
+    vocabulary: INITIAL_VOCABULARY,
   };
 }
 
@@ -98,6 +103,10 @@ export function App() {
               startDate: effectiveStartDate,
             },
             sessions: migratedSessions,
+            vocabulary:
+              Array.isArray(parsed.vocabulary) && parsed.vocabulary.length > 0
+                ? parsed.vocabulary
+                : INITIAL_VOCABULARY,
           };
         }
       }
@@ -363,6 +372,46 @@ export function App() {
     showToast('Simulacro guardado y graficado en el Dashboard.');
   };
 
+  // Vocabulary handlers
+  const handleAddVocabularyWord = (entry: Omit<VocabularyEntry, 'id'>) => {
+    const newWord: VocabularyEntry = {
+      ...entry,
+      id: `voc-${Date.now()}`,
+    };
+    setState((prev) => ({
+      ...prev,
+      vocabulary: [newWord, ...(prev.vocabulary || INITIAL_VOCABULARY)],
+    }));
+    showToast(`Palabra «${entry.word}» añadida a tu glosario.`);
+  };
+
+  const handleUpdateVocabularyWord = (updated: VocabularyEntry) => {
+    setState((prev) => ({
+      ...prev,
+      vocabulary: (prev.vocabulary || INITIAL_VOCABULARY).map((v) =>
+        v.id === updated.id ? updated : v
+      ),
+    }));
+    showToast(`Palabra «${updated.word}» actualizada.`);
+  };
+
+  const handleToggleVocabularyMastered = (id: string) => {
+    setState((prev) => ({
+      ...prev,
+      vocabulary: (prev.vocabulary || INITIAL_VOCABULARY).map((v) =>
+        v.id === id ? { ...v, mastered: !v.mastered } : v
+      ),
+    }));
+  };
+
+  const handleDeleteVocabularyWord = (id: string) => {
+    setState((prev) => ({
+      ...prev,
+      vocabulary: (prev.vocabulary || INITIAL_VOCABULARY).filter((v) => v.id !== id),
+    }));
+    showToast('Palabra eliminada del glosario.');
+  };
+
   // Export & Import JSON Backup
   const handleExportJson = () => {
     const dataStr = JSON.stringify(state, null, 2);
@@ -412,6 +461,7 @@ export function App() {
   const allQuestions = [...INITIAL_QUESTIONS_BANK, ...state.customQuestions];
   const pendingErrorsCount = state.errorNotebook.filter((e) => !e.mastered).length;
   const completedSessionsCount = state.sessions.filter((s) => s.completed).length;
+  const vocabularyList = state.vocabulary || INITIAL_VOCABULARY;
 
   const navItems: Array<{
     id: ModuleId;
@@ -454,8 +504,15 @@ export function App() {
       badge: pendingErrorsCount > 0 ? pendingErrorsCount : undefined,
     },
     {
+      id: 'vocabulario',
+      label: '6. Vocabulario y Léxico',
+      shortLabel: 'Léxico',
+      icon: <BookA className="h-4 w-4" />,
+      badge: vocabularyList.length,
+    },
+    {
       id: 'recursos',
-      label: '6. Recursos y Tutor IA',
+      label: '7. Recursos y Tutor IA',
       shortLabel: 'Recursos',
       icon: <Library className="h-4 w-4" />,
     },
@@ -758,6 +815,16 @@ export function App() {
             />
           )}
 
+          {activeModule === 'vocabulario' && (
+            <VocabularyModule
+              vocabulary={vocabularyList}
+              onAddWord={handleAddVocabularyWord}
+              onUpdateWord={handleUpdateVocabularyWord}
+              onToggleMastered={handleToggleVocabularyMastered}
+              onDeleteWord={handleDeleteVocabularyWord}
+            />
+          )}
+
           {activeModule === 'recursos' && (
             <ResourcesModule
               onExportJson={handleExportJson}
@@ -768,7 +835,7 @@ export function App() {
       </main>
 
       {/* ==================== NAVEGACIÓN INFERIOR MÓVIL ==================== */}
-      <nav className="fixed bottom-0 inset-x-0 z-30 grid grid-cols-6 border-t border-slate-200 bg-white/95 py-1.5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 lg:hidden">
+      <nav className="fixed bottom-0 inset-x-0 z-30 grid grid-cols-7 border-t border-slate-200 bg-white/95 py-1.5 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 lg:hidden">
         {navItems.map((item) => {
           const isActive = activeModule === item.id;
           return (
